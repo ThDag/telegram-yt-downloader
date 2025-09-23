@@ -1,6 +1,5 @@
 # Know: if the update or context features give error "it not known of None bla bla" put it inside a if statement checking that the thing is not None
 
-
 import asyncio
 from typing import Final
 
