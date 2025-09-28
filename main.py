@@ -1,9 +1,11 @@
 # Know: if the update or context features give error "it not known of None bla bla" put it inside a if statement checking that the thing is not None
 
 import asyncio
+import os
 from typing import Final
 
 import numexpr
+from dotenv import load_dotenv
 from telegram import (
     ForceReply,
     InlineKeyboardButton,
@@ -24,7 +26,10 @@ from telegram.ext import (
 
 from videoDownloader import downloadVideo
 
-TOKEN: Final = "7665493594:AAHRnkGGAz2ia45VzIiw7K3OTHBXwAh6FTE"
+load_dotenv()
+
+TOKEN: Final = os.getenv("TELEGRAM_TOKEN")
+
 BOT_USERNAME: Final = "@TahaDagistanliBot"
 
 keyboard_animals = [
@@ -164,12 +169,21 @@ async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE)
         update.effective_chat.id, "This may take a while"
     )
 
-    print(
-        downloadVideo(
-            context.user_data.get("links_to_download", []), int(update.message.text)
-        )
+    file_names = downloadVideo(
+        context.user_data.get("links_to_download", []), int(update.message.text)
     )
     await wait_message.edit_text("Done, Sending the video(s)")
+
+    if file_names == None:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text="there has been an error, lol sorry."
+        )
+
+    for i in file_names:
+        with open(i, "rb") as file:
+            await context.bot.send_video(
+                chat_id=update.effective_chat.id, video=file, caption="i"
+            )
 
     return ConversationHandler.END
 
