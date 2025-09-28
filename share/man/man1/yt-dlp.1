@@ -65,9 +65,6 @@ to skip unavailable videos in a playlist (default)
 Abort downloading of further videos if an error occurs (Alias:
 --no-ignore-errors)
 .TP
---dump-user-agent
-Display the current user-agent and exit
-.TP
 --list-extractors
 List all supported extractors and exit
 .TP
@@ -414,9 +411,6 @@ This disables n_entries, --playlist-random and --playlist-reverse
 Process videos in the playlist only after the entire playlist is parsed
 (default)
 .TP
---xattr-set-filesize
-Set file xattribute ytdl.filesize with expected file size
-.TP
 --hls-use-mpegts
 Use the mpegts container for HLS videos; allowing some players to play
 the video while downloading, and reducing the chance of file corruption
@@ -442,8 +436,7 @@ e.g.
 --downloader \f[I][PROTO:]NAME\f[R]
 Name or path of the external downloader to use (optionally) prefixed by
 the protocols (http, ftp, m3u8, dash, rstp, rtmp, mms) to use it for.
-Currently supports native, aria2c, avconv, axel, curl, ffmpeg, httpie,
-wget.
+Currently supports native, aria2c, axel, curl, ffmpeg, httpie, wget.
 You can use this option multiple times to set different downloaders for
 different protocols.
 E.g.
@@ -2669,8 +2662,7 @@ The currently available clients are \f[V]web\f[R], \f[V]web_safari\f[R],
 \f[V]web_embedded\f[R], \f[V]web_music\f[R], \f[V]web_creator\f[R],
 \f[V]mweb\f[R], \f[V]ios\f[R], \f[V]android\f[R], \f[V]android_vr\f[R],
 \f[V]tv\f[R], \f[V]tv_simply\f[R] and \f[V]tv_embedded\f[R].
-By default, \f[V]tv_simply,tv,web\f[R] is used, but
-\f[V]tv,web_safari,web\f[R] is used when authenticating with cookies and
+By default, \f[V]tv,web_safari,web\f[R] is used, and
 \f[V]tv,web_creator,web\f[R] is used with premium accounts.
 The \f[V]web_music\f[R] client is added for \f[V]music.youtube.com\f[R]
 URLs when logged-in cookies are used.
@@ -2709,11 +2701,18 @@ requests.
 Will overwrite any default ones set by yt-dlp.
 .IP \[bu] 2
 \f[V]player_js_variant\f[R]: The player javascript variant to use for
-signature and nsig deciphering.
-The known variants are: \f[V]main\f[R], \f[V]tce\f[R], \f[V]tv\f[R],
-\f[V]tv_es6\f[R], \f[V]phone\f[R], \f[V]tablet\f[R].
+n/sig deciphering.
+The known variants are: \f[V]main\f[R], \f[V]tcc\f[R], \f[V]tce\f[R],
+\f[V]es5\f[R], \f[V]es6\f[R], \f[V]tv\f[R], \f[V]tv_es6\f[R],
+\f[V]phone\f[R], \f[V]tablet\f[R].
 The default is \f[V]main\f[R], and the others are for debugging
 purposes.
+You can use \f[V]actual\f[R] to go with what is prescribed by the site
+.IP \[bu] 2
+\f[V]player_js_version\f[R]: The player javascript version to use for
+n/sig deciphering, in the format of
+\f[V]signature_timestamp\[at]hash\f[R].
+Currently, the default is to force \f[V]20348\[at]0004de42\f[R].
 You can use \f[V]actual\f[R] to go with what is prescribed by the site
 .IP \[bu] 2
 \f[V]comment_sort\f[R]: \f[V]top\f[R] or \f[V]new\f[R] (default) -
@@ -3223,15 +3222,6 @@ BSD-3-Clause (https://github.com/mitya57/secretstorage/blob/master/LICENSE)
 .IP \[bu] 2
 Any external downloader that you want to use with \f[V]--downloader\f[R]
 .SS Deprecated
-.IP \[bu] 2
-\f[B]avconv\f[R] and \f[B]avprobe\f[R] (https://www.libav.org) - Now
-\f[B]deprecated\f[R] alternative to ffmpeg.
-License depends on the build (https://libav.org/legal)
-.IP \[bu] 2
-\f[B]sponskrub\f[R] (https://github.com/faissaloo/SponSkrub) - For using
-the now \f[B]deprecated\f[R] sponskrub options.
-Licensed under
-GPLv3+ (https://github.com/faissaloo/SponSkrub/blob/master/LICENCE.md)
 .IP \[bu] 2
 \f[B]rtmpdump\f[R] (http://rtmpdump.mplayerhq.hu) - For downloading
 \f[V]rtmp\f[R] streams.
@@ -3748,9 +3738,6 @@ Download livestreams from the start using \f[V]--live-from-start\f[R]
 .IP \[bu] 2
 Channel URLs download all uploads of the channel, including shorts and
 live
-.IP \[bu] 2
-Support for logging in with
-OAuth (https://github.com/yt-dlp/yt-dlp/wiki/Extractors#logging-in-with-oauth)
 .RE
 .IP \[bu] 2
 \f[B]Cookies from browser\f[R]: Cookies can be automatically extracted
@@ -4108,11 +4095,7 @@ are other alternatives to achieve the same
 --hls-prefer-native              --downloader \[dq]m3u8:native\[dq]
 --hls-prefer-ffmpeg              --downloader \[dq]m3u8:ffmpeg\[dq]
 --list-formats-old               --compat-options list-formats (Alias: --no-list-formats-as-table)
---list-formats-as-table          --compat-options -list-formats [Default] (Alias: --no-list-formats-old)
---youtube-skip-dash-manifest     --extractor-args \[dq]youtube:skip=dash\[dq] (Alias: --no-youtube-include-dash-manifest)
---youtube-skip-hls-manifest      --extractor-args \[dq]youtube:skip=hls\[dq] (Alias: --no-youtube-include-hls-manifest)
---youtube-include-dash-manifest  Default (Alias: --no-youtube-skip-dash-manifest)
---youtube-include-hls-manifest   Default (Alias: --no-youtube-skip-hls-manifest)
+--list-formats-as-table          --compat-options -list-formats [Default]
 --geo-bypass                     --xff \[dq]default\[dq]
 --no-geo-bypass                  --xff \[dq]never\[dq]
 --geo-bypass-country CODE        --xff CODE
@@ -4127,7 +4110,6 @@ These options are not intended to be used by the end-user
 \f[C]
 --test                           Download only part of video for testing extractors
 --load-pages                     Load pages dumped by --write-pages
---youtube-print-sig-code         For testing youtube signatures
 --allow-unplayable-formats       List unplayable formats also
 --no-allow-unplayable-formats    Default
 \f[R]
@@ -4138,11 +4120,7 @@ These are aliases that are no longer documented for various reasons
 .IP
 .nf
 \f[C]
---avconv-location                --ffmpeg-location
 --clean-infojson                 --clean-info-json
---cn-verification-proxy URL      --geo-verification-proxy URL
---dump-headers                   --print-traffic
---dump-intermediate-pages        --dump-pages
 --force-write-download-archive   --force-write-archive
 --no-clean-infojson              --no-clean-info-json
 --no-split-tracks                --no-split-chapters
@@ -4159,7 +4137,7 @@ These are aliases that are no longer documented for various reasons
 .SS Sponskrub Options
 .PP
 Support for SponSkrub (https://github.com/faissaloo/SponSkrub) has been
-deprecated in favor of the \f[V]--sponsorblock\f[R] options
+removed in favor of the \f[V]--sponsorblock\f[R] options
 .IP
 .nf
 \f[C]
@@ -4187,6 +4165,17 @@ These options may no longer work as intended
 --no-include-ads                 Default
 --write-annotations              No supported site has annotations now
 --no-write-annotations           Default
+--avconv-location                Removed alias for --ffmpeg-location
+--cn-verification-proxy URL      Removed alias for --geo-verification-proxy URL
+--dump-headers                   Removed alias for --print-traffic
+--dump-intermediate-pages        Removed alias for --dump-pages
+--youtube-skip-dash-manifest     Removed alias for --extractor-args \[dq]youtube:skip=dash\[dq] (Alias: --no-youtube-include-dash-manifest)
+--youtube-skip-hls-manifest      Removed alias for --extractor-args \[dq]youtube:skip=hls\[dq] (Alias: --no-youtube-include-hls-manifest)
+--youtube-include-dash-manifest  Default (Alias: --no-youtube-skip-dash-manifest)
+--youtube-include-hls-manifest   Default (Alias: --no-youtube-skip-hls-manifest)
+--youtube-print-sig-code         Removed testing functionality
+--dump-user-agent                No longer supported
+--xattr-set-filesize             No longer supported
 --compat-options seperate-video-versions  No longer needed
 --compat-options no-youtube-prefer-utc-upload-date  No longer supported
 \f[R]

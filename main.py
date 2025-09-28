@@ -24,7 +24,7 @@ from telegram.ext import (
     filters,
 )
 
-from videoDownloader import downloadVideo
+from videoDownloader import deleteVideo, downloadVideo
 
 load_dotenv()
 
@@ -172,6 +172,7 @@ async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE)
     file_names = downloadVideo(
         context.user_data.get("links_to_download", []), int(update.message.text)
     )
+
     await wait_message.edit_text("Done, Sending the video(s)")
 
     if file_names == None:
@@ -179,12 +180,19 @@ async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE)
             chat_id=update.effective_chat.id, text="there has been an error, lol sorry."
         )
 
-    for i in file_names:
-        with open(i, "rb") as file:
-            await context.bot.send_video(
-                chat_id=update.effective_chat.id, video=file, caption="i"
-            )
+    else:
+        for i in file_names:
+            with open(i, "rb") as file:
+                await context.bot.send_video(
+                    chat_id=update.effective_chat.id, video=file, caption=i
+                )
+            deleteVideo(i)
 
+    return ConversationHandler.END
+
+
+async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="cancelled")
     return ConversationHandler.END
 
 
@@ -213,6 +221,8 @@ if __name__ == "__main__":
     hi_handler = CommandHandler("hi", hi_command)
     calc_handler = CommandHandler("calc", calc_command)
     downloader_handler = CommandHandler("download", dowloader_command)
+    cancel_handler = CommandHandler("cancel", cancel_command)
+
     CALC_FOLLOWUP = 1
     calc_convo = ConversationHandler(
         entry_points=[calc_handler],  # ignore ER
@@ -228,7 +238,7 @@ if __name__ == "__main__":
                 MessageHandler(filters.TEXT & ~filters.COMMAND, download_continium)
             ]
         },
-        fallbacks=[],
+        fallbacks=[cancel_handler],
     )
 
     callback_handler = CallbackQueryHandler(

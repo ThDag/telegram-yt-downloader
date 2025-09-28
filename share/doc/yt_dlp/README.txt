@@ -308,10 +308,6 @@ Misc
 
 Deprecated
 
--   avconv and avprobe - Now deprecated alternative to ffmpeg. License
-    depends on the build
--   sponskrub - For using the now deprecated sponskrub options. Licensed
-    under GPLv3+
 -   rtmpdump - For downloading rtmp streams. ffmpeg can be used instead
     with --downloader ffmpeg. Licensed under GPLv2+
 -   mplayer or mpv - For downloading rstp/mms streams. ffmpeg can be
@@ -414,7 +410,6 @@ General Options:
                                     playlist (default)
     --abort-on-error                Abort downloading of further videos if an
                                     error occurs (Alias: --no-ignore-errors)
-    --dump-user-agent               Display the current user-agent and exit
     --list-extractors               List all supported extractors and exit
     --extractor-descriptions        Output descriptions of all supported
                                     extractors and exit
@@ -669,8 +664,6 @@ Download Options:
                                     --playlist-random and --playlist-reverse
     --no-lazy-playlist              Process videos in the playlist only after
                                     the entire playlist is parsed (default)
-    --xattr-set-filesize            Set file xattribute ytdl.filesize with
-                                    expected file size
     --hls-use-mpegts                Use the mpegts container for HLS videos;
                                     allowing some players to play the video
                                     while downloading, and reducing the chance
@@ -694,9 +687,9 @@ Download Options:
                                     use (optionally) prefixed by the protocols
                                     (http, ftp, m3u8, dash, rstp, rtmp, mms) to
                                     use it for. Currently supports native,
-                                    aria2c, avconv, axel, curl, ffmpeg, httpie,
-                                    wget. You can use this option multiple times
-                                    to set different downloaders for different
+                                    aria2c, axel, curl, ffmpeg, httpie, wget.
+                                    You can use this option multiple times to
+                                    set different downloaders for different
                                     protocols. E.g. --downloader aria2c
                                     --downloader "dash,m3u8:native" will use
                                     aria2c for http/ftp downloads, and the
@@ -2261,8 +2254,7 @@ youtube
 -   player_client: Clients to extract video data from. The currently
     available clients are web, web_safari, web_embedded, web_music,
     web_creator, mweb, ios, android, android_vr, tv, tv_simply and
-    tv_embedded. By default, tv_simply,tv,web is used, but
-    tv,web_safari,web is used when authenticating with cookies and
+    tv_embedded. By default, tv,web_safari,web is used, and
     tv,web_creator,web is used with premium accounts. The web_music
     client is added for music.youtube.com URLs when logged-in cookies
     are used. The web_embedded client is added for age-restricted videos
@@ -2287,11 +2279,15 @@ youtube
     purposes and don't skip any network requests
 -   player_params: YouTube player parameters to use for player requests.
     Will overwrite any default ones set by yt-dlp.
--   player_js_variant: The player javascript variant to use for
-    signature and nsig deciphering. The known variants are: main, tce,
-    tv, tv_es6, phone, tablet. The default is main, and the others are
-    for debugging purposes. You can use actual to go with what is
-    prescribed by the site
+-   player_js_variant: The player javascript variant to use for n/sig
+    deciphering. The known variants are: main, tcc, tce, es5, es6, tv,
+    tv_es6, phone, tablet. The default is main, and the others are for
+    debugging purposes. You can use actual to go with what is prescribed
+    by the site
+-   player_js_version: The player javascript version to use for n/sig
+    deciphering, in the format of signature_timestamp@hash. Currently,
+    the default is to force 20348@0004de42. You can use actual to go
+    with what is prescribed by the site
 -   comment_sort: top or new (default) - choose comment sorting mode (on
     YouTube's side)
 -   max_comments: Limit the amount of comments to gather.
@@ -2855,7 +2851,6 @@ New features
         (experimental)
     -   Channel URLs download all uploads of the channel, including
         shorts and live
-    -   Support for logging in with OAuth
 
 -   Cookies from browser: Cookies can be automatically extracted from
     all major web browsers using
@@ -3121,11 +3116,7 @@ are other alternatives to achieve the same
     --hls-prefer-native              --downloader "m3u8:native"
     --hls-prefer-ffmpeg              --downloader "m3u8:ffmpeg"
     --list-formats-old               --compat-options list-formats (Alias: --no-list-formats-as-table)
-    --list-formats-as-table          --compat-options -list-formats [Default] (Alias: --no-list-formats-old)
-    --youtube-skip-dash-manifest     --extractor-args "youtube:skip=dash" (Alias: --no-youtube-include-dash-manifest)
-    --youtube-skip-hls-manifest      --extractor-args "youtube:skip=hls" (Alias: --no-youtube-include-hls-manifest)
-    --youtube-include-dash-manifest  Default (Alias: --no-youtube-skip-dash-manifest)
-    --youtube-include-hls-manifest   Default (Alias: --no-youtube-skip-hls-manifest)
+    --list-formats-as-table          --compat-options -list-formats [Default]
     --geo-bypass                     --xff "default"
     --no-geo-bypass                  --xff "never"
     --geo-bypass-country CODE        --xff CODE
@@ -3137,7 +3128,6 @@ These options are not intended to be used by the end-user
 
     --test                           Download only part of video for testing extractors
     --load-pages                     Load pages dumped by --write-pages
-    --youtube-print-sig-code         For testing youtube signatures
     --allow-unplayable-formats       List unplayable formats also
     --no-allow-unplayable-formats    Default
 
@@ -3145,11 +3135,7 @@ Old aliases
 
 These are aliases that are no longer documented for various reasons
 
-    --avconv-location                --ffmpeg-location
     --clean-infojson                 --clean-info-json
-    --cn-verification-proxy URL      --geo-verification-proxy URL
-    --dump-headers                   --print-traffic
-    --dump-intermediate-pages        --dump-pages
     --force-write-download-archive   --force-write-archive
     --no-clean-infojson              --no-clean-info-json
     --no-split-tracks                --no-split-chapters
@@ -3164,7 +3150,7 @@ These are aliases that are no longer documented for various reasons
 
 Sponskrub Options
 
-Support for SponSkrub has been deprecated in favor of the --sponsorblock
+Support for SponSkrub has been removed in favor of the --sponsorblock
 options
 
     --sponskrub                      --sponsorblock-mark all
@@ -3188,6 +3174,17 @@ These options may no longer work as intended
     --no-include-ads                 Default
     --write-annotations              No supported site has annotations now
     --no-write-annotations           Default
+    --avconv-location                Removed alias for --ffmpeg-location
+    --cn-verification-proxy URL      Removed alias for --geo-verification-proxy URL
+    --dump-headers                   Removed alias for --print-traffic
+    --dump-intermediate-pages        Removed alias for --dump-pages
+    --youtube-skip-dash-manifest     Removed alias for --extractor-args "youtube:skip=dash" (Alias: --no-youtube-include-dash-manifest)
+    --youtube-skip-hls-manifest      Removed alias for --extractor-args "youtube:skip=hls" (Alias: --no-youtube-include-hls-manifest)
+    --youtube-include-dash-manifest  Default (Alias: --no-youtube-skip-dash-manifest)
+    --youtube-include-hls-manifest   Default (Alias: --no-youtube-skip-hls-manifest)
+    --youtube-print-sig-code         Removed testing functionality
+    --dump-user-agent                No longer supported
+    --xattr-set-filesize             No longer supported
     --compat-options seperate-video-versions  No longer needed
     --compat-options no-youtube-prefer-utc-upload-date  No longer supported
 

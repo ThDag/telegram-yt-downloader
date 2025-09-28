@@ -15,8 +15,7 @@ def downloadVideo(links: list[str], length: int):
 
         end_time = start_time + length
 
-        first_file = f"downloads/output{video_index}_untrimmed.mp4"
-        trimmed_file = f"downloads/output{video_index}.mp4"
+        file_name = f"downloads/output{video_index}.mp4"
 
         yt_command = [
             "yt-dlp",
@@ -26,23 +25,22 @@ def downloadVideo(links: list[str], length: int):
             f"*{start_time}-{end_time}",
             "--recode-video",
             "mp4",
+            "--force-keyframes-at-cuts",
             "-o",
-            first_file,
+            file_name,
             f"{i}",
         ]
 
-        bug_trimmer_command = ["ffmpeg", "-i", first_file, "-ss", "10", trimmed_file]
+        # bug_trimmer_command = ["ffmpeg", "-i", first_file, "-ss", "10", trimmed_file]
+        # trim_output = subprocess.run(bug_trimmer_command)
 
-        subprocess.run(yt_command)
+        download_output = subprocess.run(yt_command)
 
-        trim_output = subprocess.run(bug_trimmer_command)
-
-        if trim_output.returncode == 0:
-            os.remove(first_file)
-            print("Downloaded, trimmed, and untrimmed file removed")
-            output_file_names.append(trimmed_file)
+        if download_output.returncode == 0:
+            print("Downloaded")
+            output_file_names.append(file_name)
         else:
-            print("something went wrong with trimming")
+            print("something went wrong with downloading")
             return None
 
         video_index += 1
@@ -50,6 +48,10 @@ def downloadVideo(links: list[str], length: int):
     return output_file_names
 
 
-list = ["https://youtu.be/9PKIs32ldyo?t=18", "https://youtu.be/5B4HENeOic8?t=120"]
+def deleteVideo(name: str):
+    os.remove(name)
 
-print(downloadVideo(list, 15))
+
+# list = ["https://youtu.be/9PKIs32ldyo?t=18", "https://youtu.be/5B4HENeOic8?t=120"]
+#
+# print(downloadVideo(list, 15))
