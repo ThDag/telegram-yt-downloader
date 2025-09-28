@@ -33,6 +33,8 @@ def downloadVideo(links: list[str], length: int):
 
         bug_trimmer_command = ["ffmpeg", "-i", first_file, "-ss", "10", trimmed_file]
 
+        subprocess.run(yt_command)
+
         trim_output = subprocess.run(bug_trimmer_command)
 
         if trim_output.returncode == 0:
