@@ -1,10 +1,10 @@
 # Know: if the update or context features give error "it not known of None bla bla" put it inside a if statement checking that the thing is not None
 
-import asyncio
 import os
 from typing import Final
 
 import numexpr
+import validators
 from dotenv import load_dotenv
 from telegram import (
     ForceReply,
@@ -141,15 +141,13 @@ async def hi_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def dowloader_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # await context.bot.send_chat_action(
-    #     chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    # ) # ignore the typing effect (it lasts 5 second, if you wanna use it use a loop to keep it going)
-    #
 
     if context.args == []:
         await context.bot.send_message(
-            update.effective_chat.id, "Please send the link(s) along side the command"
+            update.effective_chat.id, "Please send the link(s)"
         )
+
+        return DOWNLOADASKFORLINK
 
     else:
 
@@ -163,24 +161,61 @@ async def dowloader_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return DOWNLOADCONTINIUM
 
 
+async def download_askforlink(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("download askforlink activated")  # debug
+    print(update.message.text.split())  # debug
+
+    try:
+        context.user_data["links_to_download"] = update.message.text.split()
+    except:
+        print("error when writing data to user data in download_askforlink")
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="there has been a error, probably your fault because my code is flawless.",
+        )
+
+        return DOWNLOADASKFORLINK
+
+    # validate if the urls are legit
+    for i in context.user_data.get("links_to_download", []):
+        if not validators.url(i):
+            print(f"invalid link found in input {i}")
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, text=f"invalid link found {i}"
+            )
+
+            return DOWNLOADASKFORLINK
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Please choose the length of (each) video in seconds.",
+    )
+
+    return DOWNLOADCONTINIUM
+
+
 async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    print("download continium activated")  # debug
 
     wait_message = await context.bot.send_message(
         update.effective_chat.id, "This may take a while"
     )
 
+    print("about to run downloadvideo function")  # debug
     file_names = downloadVideo(
         context.user_data.get("links_to_download", []), int(update.message.text)
     )
-
-    await wait_message.edit_text("Done, Sending the video(s)")
+    print(file_names, "this the the output of file_names")  # debug
 
     if file_names == None:
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="there has been an error, lol sorry."
+            chat_id=update.effective_chat.id, text="There has been an error, lol sorry."
         )
 
     else:
+        await wait_message.edit_text("Done, Sending the video(s)")
         for i in file_names:
             with open(i, "rb") as file:
                 await context.bot.send_video(
@@ -231,12 +266,16 @@ if __name__ == "__main__":
     )
 
     DOWNLOADCONTINIUM = 1
+    DOWNLOADASKFORLINK = 2
     downloader_convo = ConversationHandler(
         entry_points=[downloader_handler],
         states={
             DOWNLOADCONTINIUM: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, download_continium)
-            ]
+                MessageHandler(filters.TEXT & ~filters.COMMAND, download_continium),
+            ],
+            DOWNLOADASKFORLINK: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, download_askforlink),
+            ],
         },
         fallbacks=[cancel_handler],
     )
