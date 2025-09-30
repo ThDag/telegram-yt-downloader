@@ -1,0 +1,6 @@
+numexpr
+numpy
+python-dotenv
+python-telegram-bot
+validators
+yt-dlp
