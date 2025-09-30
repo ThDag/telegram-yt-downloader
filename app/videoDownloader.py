@@ -15,7 +15,7 @@ def downloadVideo(links: list[str], length: int):
 
         end_time = start_time + length
 
-        file_name = f"/data/downloads/output{video_index}.mp4"
+        file_name = f"./data/downloads/output{video_index}.mp4"
 
         yt_command = [
             "yt-dlp",
