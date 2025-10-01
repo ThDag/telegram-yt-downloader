@@ -23,7 +23,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
 from videoDownloader import deleteVideo, downloadVideo
 
 load_dotenv()
@@ -200,7 +199,7 @@ async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE)
     print("download continium activated")  # debug
 
     wait_message = await context.bot.send_message(
-        update.effective_chat.id, "This may take a while"
+        update.effective_chat.id, "This may take a while (like a lot)"
     )
 
     print("about to run downloadvideo function")  # debug
