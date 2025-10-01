@@ -27,7 +27,7 @@ def downloadVideo(links: list[str], length: int):
             "mp4",
             "--force-keyframes-at-cuts",
             "-o",
-            file_name,
+            file_name,  # Please don't inject "rm -rf /" here, thanks :] !
             f"{i}",
         ]
 
