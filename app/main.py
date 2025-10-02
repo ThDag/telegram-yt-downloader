@@ -1,4 +1,4 @@
-# Know: if the update or context features give error "it not known of None bla bla" put it inside a if statement checking that the thing is not None
+# this code was used to learn how to make telegram bots. not necessary other than some silly code and features.
 
 import os
 from typing import Final
@@ -23,13 +23,11 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from videoDownloader import deleteVideo, downloadVideo
 
 load_dotenv()
 
 TOKEN: Final = os.getenv("TELEGRAM_TOKEN")
 
-BOT_USERNAME: Final = "@TahaDagistanliBot"
 
 keyboard_animals = [
     [InlineKeyboardButton("cat", callback_data="animal_cat")],
@@ -139,92 +137,6 @@ async def hi_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-async def dowloader_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if context.args == []:
-        await context.bot.send_message(
-            update.effective_chat.id, "Please send the link(s)"
-        )
-
-        return DOWNLOADASKFORLINK
-
-    else:
-
-        context.user_data["links_to_download"] = context.args
-
-        await context.bot.send_message(
-            update.effective_chat.id,
-            "Please choose the length of (each) video in seconds.",
-        )
-
-        return DOWNLOADCONTINIUM
-
-
-async def download_askforlink(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("download askforlink activated")  # debug
-    print(update.message.text.split())  # debug
-
-    try:
-        context.user_data["links_to_download"] = update.message.text.split()
-    except:
-        print("error when writing data to user data in download_askforlink")
-
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="there has been a error, probably your fault because my code is flawless.",
-        )
-
-        return DOWNLOADASKFORLINK
-
-    # validate if the urls are legit
-    for i in context.user_data.get("links_to_download", []):
-        if not validators.url(i):
-            print(f"invalid link found in input {i}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id, text=f"invalid link found {i}"
-            )
-
-            return DOWNLOADASKFORLINK
-
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Please choose the length of (each) video in seconds.",
-    )
-
-    return DOWNLOADCONTINIUM
-
-
-async def download_continium(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    print("download continium activated")  # debug
-
-    wait_message = await context.bot.send_message(
-        update.effective_chat.id, "This may take a while (like a lot)"
-    )
-
-    print("about to run downloadvideo function")  # debug
-    file_names = downloadVideo(
-        context.user_data.get("links_to_download", []), int(update.message.text)
-    )
-    print(file_names, "this the the output of file_names")  # debug
-
-    if file_names == None:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="There has been an error, lol sorry."
-        )
-
-    else:
-        await wait_message.edit_text("Done, Sending the video(s)")
-        for i in file_names:
-            with open(i, "rb") as file:
-                await context.bot.send_video(
-                    chat_id=update.effective_chat.id, video=file, caption=i
-                )
-            deleteVideo(i)
-
-    return ConversationHandler.END
-
-
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="cancelled")
     return ConversationHandler.END
@@ -254,28 +166,12 @@ if __name__ == "__main__":
     inlinekeyboard_handler = CommandHandler("animal", animal_command)
     hi_handler = CommandHandler("hi", hi_command)
     calc_handler = CommandHandler("calc", calc_command)
-    downloader_handler = CommandHandler("download", dowloader_command)
     cancel_handler = CommandHandler("cancel", cancel_command)
 
     CALC_FOLLOWUP = 1
     calc_convo = ConversationHandler(
         entry_points=[calc_handler],  # ignore ER
         states={CALC_FOLLOWUP: [MessageHandler(filters.TEXT, calc_followup)]},
-        fallbacks=[],
-    )
-
-    DOWNLOADCONTINIUM = 1
-    DOWNLOADASKFORLINK = 2
-    downloader_convo = ConversationHandler(
-        entry_points=[downloader_handler],
-        states={
-            DOWNLOADCONTINIUM: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, download_continium),
-            ],
-            DOWNLOADASKFORLINK: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, download_askforlink),
-            ],
-        },
         fallbacks=[cancel_handler],
     )
 
@@ -286,7 +182,6 @@ if __name__ == "__main__":
     app.add_handler(start_handler)
     app.add_handler(inlinekeyboard_handler)
     app.add_handler(hi_handler)
-    app.add_handler(downloader_convo)
     app.add_handler(calc_convo)
 
     app.add_handler(callback_handler)

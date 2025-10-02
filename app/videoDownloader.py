@@ -6,7 +6,25 @@ from urllib.parse import parse_qs, urlparse
 def downloadVideo(links: list[str], length: int):
 
     output_file_names = []
-    video_index = 0
+
+    def file_namer():
+        # reads the list of files in download directory and gives you the name of the next file.
+        current_files = os.listdir("./data/downloads")
+
+        numbers = []
+        for i in current_files:
+            current_file_number = ""
+            for a in i:
+                if a.isdigit():
+                    current_file_number += a
+            if current_file_number:
+                numbers.append(current_file_number)
+
+        int_number = list(map(int, numbers))
+        new_number = int(max(int_number) + 1)
+
+        file_name = f"./data/downloads/output{new_number}.mp4"
+        return file_name
 
     for i in links:
         parsed = urlparse(i)
@@ -15,7 +33,7 @@ def downloadVideo(links: list[str], length: int):
 
         end_time = start_time + length
 
-        file_name = f"./data/downloads/output{video_index}.mp4"
+        file_name = file_namer()
 
         yt_command = [
             "yt-dlp",
@@ -34,16 +52,14 @@ def downloadVideo(links: list[str], length: int):
         # bug_trimmer_command = ["ffmpeg", "-i", first_file, "-ss", "10", trimmed_file]
         # trim_output = subprocess.run(bug_trimmer_command)
 
-        download_output = subprocess.run(yt_command)
+        download_output = subprocess.run(yt_command, capture_output=True, text=True)
 
         if download_output.returncode == 0:
             print("Downloaded")
             output_file_names.append(file_name)
         else:
             print("something went wrong with downloading")
-            return None
-
-        video_index += 1
+            return str(download_output.stderr)
 
     return output_file_names
 
