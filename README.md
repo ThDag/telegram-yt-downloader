@@ -4,6 +4,10 @@ You send it a youtube (or any other video platform) with timestamps (preferebly)
 
 You can host the Telegram bot yourself
 
+## Example
+
+![Usage example](assets/example.gif)
+
 ## dependencies
 
 all the dependencies are taken care of with docker. It's just ffmpeg btw.
