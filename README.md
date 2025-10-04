@@ -6,15 +6,7 @@ You can host the Telegram bot yourself
 
 ## dependencies
 
-In order for the code to run correctly you need the dependencies inside requirements.txt file and also ffmpeg
-
-```
-brew install ffmpeg # for mac
-```
-
-```
-your-favirote-package-manager install ffmpeg
-```
+all the dependencies are taken care of with docker. It's just ffmpeg btw.
 
 ## installation
 
@@ -27,6 +19,12 @@ git clone https://github.com/ThDag/telegram-yt-downloader.git
 > clone the repository
 
 2. Put your telegram bot token obtained with Botfather in telegram into .env file with the name `TELEGRAM_TOKEN`
+   Ex.
+
+```
+# .env file
+TELEGRAM_TOKEN=48320849023:laqobjsvnbj_JLofjJKLxL_idkwhatatokenlookslike
+```
 
 3.
 
@@ -38,4 +36,4 @@ docker compose up --build
 
 ## Me
 
-i made this code.
+I made this code.
