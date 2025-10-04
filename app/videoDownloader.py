@@ -72,6 +72,3 @@ def downloadVideo(links: list[str], length: int):
 
 def deleteVideo(name: str):
     os.remove(name)
-
-
-print(file_namer())

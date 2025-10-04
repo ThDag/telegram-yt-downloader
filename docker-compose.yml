@@ -2,6 +2,7 @@ services:
   myapp:
     build: .
     restart: unless-stopped
+    tty: true
     volumes:
       - .:/app
     command: python3 app/main.py
