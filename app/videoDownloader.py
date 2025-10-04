@@ -3,28 +3,31 @@ import subprocess
 from urllib.parse import parse_qs, urlparse
 
 
+def file_namer():
+    # reads the list of files in download directory and gives you the name of the next file.
+    current_files = os.listdir("./data/downloads")
+    print(current_files)
+
+    numbers = []
+    for i in current_files:
+        current_file_number = ""
+        for a in i:
+            if a.isdigit():
+                current_file_number += a
+        if current_file_number:
+            numbers.append(current_file_number)
+
+    print(numbers, " -- numbers list")
+    int_number = list(map(int, numbers))
+    new_number = int(max(int_number, default=0) + 1)
+
+    file_name = f"./data/downloads/output{new_number}.mp4"
+    return file_name
+
+
 def downloadVideo(links: list[str], length: int):
 
     output_file_names = []
-
-    def file_namer():
-        # reads the list of files in download directory and gives you the name of the next file.
-        current_files = os.listdir("./data/downloads")
-
-        numbers = []
-        for i in current_files:
-            current_file_number = ""
-            for a in i:
-                if a.isdigit():
-                    current_file_number += a
-            if current_file_number:
-                numbers.append(current_file_number)
-
-        int_number = list(map(int, numbers))
-        new_number = int(max(int_number) + 1)
-
-        file_name = f"./data/downloads/output{new_number}.mp4"
-        return file_name
 
     for i in links:
         parsed = urlparse(i)
@@ -40,19 +43,22 @@ def downloadVideo(links: list[str], length: int):
             "-S",
             "res:1080",  # download no higher than 1080
             "--download-sections",
-            f"*{start_time}-{end_time}",
+            f"*{start_time}-{end_time}",  # Please don't inject "rm -rf /" here, thanks :] !
             "--recode-video",
             "mp4",
             "--force-keyframes-at-cuts",
             "-o",
-            file_name,  # Please don't inject "rm -rf /" here, thanks :] !
+            file_name,
             f"{i}",
         ]
 
         # bug_trimmer_command = ["ffmpeg", "-i", first_file, "-ss", "10", trimmed_file]
         # trim_output = subprocess.run(bug_trimmer_command)
 
-        download_output = subprocess.run(yt_command, capture_output=True, text=True)
+        try:
+            download_output = subprocess.run(yt_command, capture_output=True, text=True)
+        except:
+            print("subpocess.run command failed.")
 
         if download_output.returncode == 0:
             print("Downloaded")
@@ -68,6 +74,4 @@ def deleteVideo(name: str):
     os.remove(name)
 
 
-# list = ["https://youtu.be/9PKIs32ldyo?t=18", "https://youtu.be/5B4HENeOic8?t=120"]
-#
-# print(downloadVideo(list, 15))
+print(file_namer())
